@@ -1,0 +1,80 @@
+body { padding-top: 40px; padding-bottom: 40px; }
+.inline_edit {display:none !important;}
+.inline_text { text-decoration:underline; cursor:pointer; color:#0063DC; }
+.block { padding:2px; margin:2px 5px 2px 0;  }
+.block2 {margin:2px 5px 2px 0; }
+.w1 { width:160px; }
+.w2 { width:335px; }
+.perm ul { margin:0;margin-left:2em; padding:0; }
+.perm li { display:block; }
+.perm li.lineborder { background:#eee; }
+.perm li.selected { background:#fff9d7; }
+
+table.table thead .sorting,
+table.table thead .sorting_asc,
+table.table thead .sorting_desc,
+table.table thead .sorting_asc_disabled,
+table.table thead .sorting_desc_disabled {
+    cursor: pointer;
+    *cursor: hand;
+}
+
+table.table thead .sorting { background: url(../img/sort_both.png) no-repeat center right; }
+table.table thead .sorting_asc { background: url(../img/sort_asc.png) no-repeat center right; }
+table.table thead .sorting_desc { background: url(../img/sort_desc.png) no-repeat center right; }
+
+table.table thead .sorting_asc_disabled { background: url(../img/sort_asc_disabled.png) no-repeat center right; }
+table.table thead .sorting_desc_disabled { background: url(../img/sort_desc_disabled.png) no-repeat center right; }
+ 
+div.dataTables_info { padding-top: 8px; }
+div.dataTables_paginate { float: right; margin: 0; }
+
+#userModal .modal-body { background-color:#eee; }
+.modal-footer { background-color:#ccc; }
+.modal form {margin-bottom:0;}
+.modal legend {margin-bottom:0;}
+.dataTables_wrapper .toolbar button { margin-left:10px; }
+
+.timeline-list li {margin:0;line-height:1em;width:100%; overflow:auto;}
+.timeline-list li label {float:left;width:100px;}
+
+.form-horizontal .taskForm .control-group {margin-bottom:5px;}
+.timeline-list li .taskForm label {width:auto;}
+
+.task-description {margin: 5px 0; display:none;}
+.taskForm { margin:5px; padding:5px; }
+
+.task h4 {font-weight: lighter; font-size:14px;}
+.content-title {line-height:1em;font-size: 24px;}
+
+#commentForm .form-actions { padding-left:10px; margin:0;}
+#commentForm { border:1px solid #ccc; padding:10px; background-color:#FFF8E5; }
+
+.uploadfile { padding: 5px 0 5px 30px; background-size:24px 24px; background-repeat:no-repeat; background-position-x: left; background-position-y: center; background-image:url(../icons/file.png); }
+.doc, .docx {background-image:url(../icons/doc.png);}
+.xls, .xlsx {background-image:url(../icons/xls.png);}
+.ppt, .pptx {background-image:url(../icons/ppt.png);}
+.pdf {background-image:url(../icons/pdf.png);}
+.txt {background-image:url(../icons/txt.png);}
+.rar {background-image:url(../icons/rar.png);}
+.zip {background-image:url(../icons/zip.png);}
+.cab {background-image:url(../icons/cab.png);}
+.gz {background-image:url(../icons/zip.png);}
+.audio {background-image:url(../icons/audio.png);}
+.video {background-image:url(../icons/video.png);}
+.image {background-image:url(../icons/image.png);}
+
+tr.minor { background-color:#D9FFCC; }
+tr.major,tr.status-incomplete { background-color:#F2FFCC; }
+tr.critical { background-color:#FFCCD9; }
+tr.status-close td,tr.status-close th,tr.status-complete td,tr.status-complete th{color:#999; background-color:#eee;}
+
+.history-div, .ticket-description, .content-descr, .task-description { margin:10px 5px; padding-bottom:10px; }
+.history-div, .ticket-description .text, .content-descr, .task-description { margin:5px 0; padding:5px; border:1px solid #ccc; background:#f7f7f7;}
+
+.stats-table th { width:120px; }
+.task-meta {margin: 5px 0;}
+
+@media (max-width: 979px) {
+    body {padding:0;}
+}
