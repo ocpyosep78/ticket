@@ -1,8 +1,6 @@
 <?php
 
 function comment_upload_script() { ?>
-<script type="text/javascript" src="<?php echo base_url('assets/js/plupload/js/browserplus-min.js'); ?>"></script>
-<script type="text/javascript" src="<?php echo base_url('assets/js/plupload/js/plupload.full.js'); ?>"></script>
 <script type="text/javascript">
     var isSubmit = false,
         getExt = function(filename) {

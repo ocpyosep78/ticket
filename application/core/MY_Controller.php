@@ -193,6 +193,7 @@ class MY_Controller extends CI_Controller {
     
     public function _after_task_edit($controller)
     {
+		$strClient = (isset($strClient)) ? $strClient : '';
         $project = $this->db->query("SELECT * FROM projects WHERE id = ? $strClient", array($controller->id))->row();
         
         $fields = array( 'task', 'description', 'user_id', 'due', 'timeline_id', 'parent_id' );
@@ -207,15 +208,12 @@ class MY_Controller extends CI_Controller {
                 if (!$t) continue;
 
                 $descr = empty($description[$k][$i]) ? '' : $description[$k][$i];
-                $user_id = empty($user_id[$k][$i]) ? 0 : $user_id[$k][$i];
-                $due = empty($due[$k][$i]) ? date('d/m/Y', strtotime('+1 day')) : $due[$k][$i];
-                $parent_id = empty($parent_id[$k][$i]) ? 0 : $parent_id[$k][$i];
+                $user_id = @empty($user_id[$k][$i]) ? 0 : $user_id[$k][$i];
+                $due = @empty($due[$k][$i]) ? date('d/m/Y', strtotime('+1 day')) : $due[$k][$i];
+                $parent_id = @empty($parent_id[$k][$i]) ? 0 : $parent_id[$k][$i];
                 $task_id = empty($task_id[$k][$i]) ? 0 : $task_id[$k][$i];
                 $tl_id = empty($timeline_id[$k][$i]) ? 0 : $timeline_id[$k][$i];
-
-                $array = array_map('intval',explode('/', $due));
-                $due = "$array[2]-$array[1]-$array[0]";
-                
+				
                 if ($user_id) {
                     $user = $this->db->query("SELECT * FROM users WHERE id = ?",array($user_id))->row();
                     if ($k == 'new') {

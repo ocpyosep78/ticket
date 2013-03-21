@@ -7,9 +7,11 @@
     <meta name="author" content="Herdian Ferdianto, PT Sinar Media Tiga">
     <link href="<?php echo base_url('assets/css/bootstrap.css'); ?>" rel="stylesheet">
     <link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/js/datepicker/css/datepicker.css'); ?>">
+	<link rel="stylesheet" type="text/css" href="<?php echo base_url('assets/js/calender/fullcalendar_gebo.css'); ?>" />
     <link href="<?php echo base_url('assets/css/hehe.css'); ?>" rel="stylesheet">
     
-    <script src="<?php echo base_url('assets/js/jquery-1.8.3.min.js'); ?>"></script>
+    <script type="text/javascript">var web = { host: '<?php echo base_url(); ?>' }</script>
+    <script type="text/javascript" src="<?php echo base_url('assets/js/jquery-1.7.2.min.js'); ?>"></script>
     <!--[if lt IE 9]>
         <script src="<?php echo base_url('assets/js/html5shiv.js'); ?>"></script>
     <![endif]-->

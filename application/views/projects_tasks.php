@@ -11,41 +11,57 @@
 
 function tasks_script() { ?>
 <script>
-    var TASKID = 0;
+    var auto_no = 0,
+		isSubmit = false,
+        getExt = function(filename) {
+            var index = filename.lastIndexOf('.'), ext = '';
+            if (index > 0) ext = filename.toLowerCase().substring( index+1 );
+            if (!ext) {
+                ext = 'file';
+            } if (/txt|doc|ppt|xls|pdf/i.test( ext )) {
+                ext = 'document ' + ext;
+            } else if (/png|gif|jpg|jpeg|tiff|bmp/i.test( ext )) {
+                ext = 'image ' + ext;
+            } else if (/mp3|aac|wav|au|ogg|wma/i.test( ext )) {
+                ext = 'audio ' + ext;
+            } else if (/mpg|wmv|mov|flv/i.test( ext )) {
+                ext = 'video ' + ext;
+            }
+            return ext;
+        };
+	
     $(function() {
         $(".btn-add-task").click(function() {
+			// local instance
+			auto_no++;
             var $button = $(this);
+			var form_id = new Date().getTime();
             
             //copy template form
             var $form = $(".addTaskForm").clone();
             
-            //set form name
-            TASKID++;
+            //set default name & value
             $form.find('[name]').each(function() {
                 var el = $(this);
-                el.prop('name', el.prop('name') + '['+TASKID+']');
+                el.prop('name', el.prop('name') + '[' + auto_no + ']');
             });
-            //set timeline ID field
             $form.find('[name^=timeline_id]').val( $button.data('timelineId') );
             $form.find('[name^=parent_id]').val( $button.data('parentId') );
             
             //add to page and display
             $button.parent().after($form);
-            $form.removeClass('hide').removeClass('addTaskForm').addClass('taskForm').show('slow');
+			$form.attr('id', form_id);
+            $form.removeClass('addTaskForm').addClass('taskForm').slideDown('slow');
             
-            //prepare datepicker & tooltip
-            var date = new Date(), val = {
-                d: date.getDate(),
-                m: date.getMonth() + 1,
-                yy: date.getFullYear().toString().substring(2),
-                yyyy: date.getFullYear()
-            }
-            $form.find('.datepicker').val(val.d+'/'+val.m+'/'+val.yyyy).datepicker().on('changeDate', function() { $(this).datepicker('hide'); });
-            $form.find("input,select,textarea").tooltip({placement:'right'});
-            $form.find("label").tooltip({placement:'left'});
-            
-            $form.find('.autogrow').autogrow();
-                    
+            //init form & upload
+			$('.taskForm .swap-id').each(function() {
+				$(this).removeClass('swap-id');
+				$(this).attr('id', $(this).data('id') + auto_no);
+			});
+			Func.InitForm({ Container: '#' + form_id });
+			Func.InitUpload({ container: 'uploadcontainer' + auto_no, browse_button: 'pickfiles' + auto_no, attachment: 'attachment[new][' + auto_no + '][]' });
+			$('#' + form_id + ' .datepicker').val(Func.GetStringFromDate(new Date()));
+			
             $form.find('.btn-cancel-form').click(function() {
                 $(this).parents('.taskForm').remove();
                 return false;
@@ -57,43 +73,39 @@ function tasks_script() { ?>
         $('.btn-edit-task').click(function() {
             var $button = $(this);
             var $form = $(".addTaskForm").clone();
+			var form_id = new Date().getTime();
+			var task_id = $button.data('taskId');
+			
             $form.find('[name]').each(function() {
                 var el = $(this);
                 el.prop('name', el.prop('name').replace(/new/, $button.data('taskId')) + '[0]');
             });
             
-            $.get('<?php echo site_url('tasks/ajaxdetail?id='); ?>'+$button.data('taskId'), function(r) {
+            $.get(web.host + 'index.php/tasks/ajaxdetail?id=' + $button.data('taskId'), function(r) {
                 var task = eval('('+r+')');
                 if (task.task) {
                     $form.find('[name^=task]').val( task.task.task );
                     $form.find('[name^=description]').val( task.task.description );
-                    var split = task.task.due.split(/-/);
-                    $form.find('[name^=due]').val( split[2]+'/'+split[1]+'/'+split[0] );
-                    
-                    //set timeline ID field
+                    $form.find('[name^=due]').val( Func.SwapDate(task.task.due) );
                     $form.find('[name^=timeline_id]').val( $button.data('timelineId') );
                     $form.find('[name^=parent_id]').val( $button.data('parentId') );
 
                     //add to page and display
                     $button.parents('li').find('.task-description[data-task-id='+$button.data('taskId')+']').after($form);
-                    $form.removeClass('hide').removeClass('addTaskForm').addClass('taskForm').show('slow');
-
-                    //prepare datepicker & tooltip
-                    var date = new Date(), val = {
-                        d: date.getDate(),
-                        m: date.getMonth() + 1,
-                        yy: date.getFullYear().toString().substring(2),
-                        yyyy: date.getFullYear()
-                    }
-                    $form.find('.datepicker').val(val.d+'/'+val.m+'/'+val.yyyy).datepicker().on('changeDate', function() { $(this).datepicker('hide'); });
-                    $form.find("input,select,textarea").tooltip({placement:'right'});
-                    $form.find("label").tooltip({placement:'left'});
+                    $form.removeClass('addTaskForm').addClass('taskForm').slideDown('slow');
+					
+					//init form & upload
+					$('.taskForm .swap-id').each(function() {
+						$(this).removeClass('swap-id');
+						$(this).attr('id', $(this).data('id') + task_id);
+					});
+					Func.InitForm({ Container: '#' + form_id });
+					Func.InitUpload({ container: 'uploadcontainer' + task_id, browse_button: 'pickfiles' + task_id, attachment: 'attachment[' + task_id + '][0][]' });
+					
                     $form.find('.btn-cancel-form').click(function() {
                         $(this).parents('.taskForm').remove();
                         return false;
                     });
-                    
-                    $form.find('.autogrow').autogrow();
                 }
             });
             
@@ -105,7 +117,7 @@ function tasks_script() { ?>
                 return false;
             var link = $(this);
             var taskId = link.data('taskId');
-            $.post('<?php echo site_url('tasks/ajaxdone'); ?>', {id:taskId}, function() {
+            $.post(web.host + 'index.php/tasks/ajaxdone', {id:taskId}, function() {
                 link.replaceWith($('<span class="label label-info">done</label>'));
             });
             return false;
@@ -116,8 +128,10 @@ function tasks_script() { ?>
                 return false;
             var link = $(this);
             var taskId = link.data('taskId');
-            $.post('<?php echo site_url('tasks/ajaxdelete'); ?>', {id:taskId}, function() {
-                $("#task-"+taskId).remove();
+            $.post(web.host + 'index.php/tasks/ajaxdelete', {id:taskId}, function(raw) {
+				eval('var result = ' + raw);
+				if (result.success)
+					$("#task-"+taskId).remove();
             });
             return false;
         });
@@ -128,6 +142,12 @@ function tasks_script() { ?>
             return false;
         });
         
+		$('#tasksForm').submit(function() {
+			$('.datepicker').each(function() {
+				$(this).val(Func.SwapDate($(this).val()));
+			});
+		});
+		
         $("#tzoffset").val(new Date().getTimezoneOffset());
     });
 </script>
@@ -143,16 +163,9 @@ include 'pagetop.php';
     <div class="row-fluid">
         <div class="span12" id="content">
             <h1><?php echo $page_title; ?></h1>
-            <div class="content-descr">
-                <?php echo nl2br(htmlspecialchars($project->description)); ?>
-            </div>
-            <ul class="attachment">
-                <?php
-                $upload_url = base_url('files/attachments');
-                foreach($project->attachments as $att): ?>
-                <li><?php echo '<a style="display:block" class="uploadfile '.get_ext($att->filename).'" href="'.$upload_url.'/'.$att->filename.'">'.basename($att->filename).'</a>'; ?></li>
-                <?php endforeach; ?>
-            </ul>
+            <div class="content-descr"><?php echo nl2br(htmlspecialchars($project->description)); ?></div>
+			
+            <?php $this->load->view('common/files', array( 'project_id' => $project->id )); ?>
             <?php include 'history.php'; show_history( 'projects', $project->id ); ?>
             
             <?php
@@ -176,7 +189,8 @@ include 'pagetop.php';
                     $btnaddtask = '<a class="btn btn-mini btn-inverse btn-add-task" data-timeline-id="'.$task->timeline_id.'" data-parent-id="'.$task->id.'" href="">add task</a>';
                     $btnedittask = '<a class="btn btn-mini btn-inverse btn-edit-task" href="" data-timeline-id="'.$task->timeline_id.'" data-parent-id="'.$task->parent_id.'" data-task-id="'.$task->id.'">edit</a>';
                     $btnviewtask = '<a class="btn btn-mini btn-inverse btn-view-task" href="'.site_url('tasks/detail?id='.$task->id).'" data-task-id="'.$task->id.'">details</a>';
-                    if ( $task->status ) {
+                    
+					if ( $task->status ) {
                         $t1 = strtotime( $task->due . " 23:59:59" );
                         $t2 = strtotime( $task->complete_date );
                         
@@ -199,8 +213,7 @@ include 'pagetop.php';
                     }
                     $btndeltask = '<a class="btn btn-danger btn-mini btn-delete-task" href="" data-task-id="'.$task->id.'">X</a>';
                     
-                    if ( $user_id != $_project->user_id )
-                    {
+                    if ( $user_id != $_project->user_id ) {
                         if (!$_user_model->has_perms($user_id, 'tasks/add'))
                             $btnaddtask = '';
                         if (!$_user_model->has_perms($user_id, 'tasks/edit'))
@@ -216,7 +229,7 @@ include 'pagetop.php';
                                 <a class="toggle-description" href="#" data-task-id="'.$task->id.'">'.$task->task.'</a>
                                 '.$btndone.'
                                 <div class="task-meta">
-                                    User:<span class="assigned label label-info">'.($task->assigned_user?$task->assigned_user:'None').'</span>
+                                    User: <span class="assigned label label-info">'.($task->assigned_user?$task->assigned_user:'None').'</span>
                                     '.$str_due.'
                                     '.$btndeltask.'
                                 </div>
@@ -255,10 +268,11 @@ include 'pagetop.php';
                     </li>
                     <?php endforeach; ?>
                 </ul>
-                <div class="form-actions">
-                    <a class="btn" href="<?php echo site_url('projects/'); ?>">Back to Projects</a>
-                </div>
             </form>
+			<div class="form-actions">
+				<a class="btn" href="<?php echo site_url('projects/'); ?>">Back to Projects</a>
+				<a class="btn" href="<?php echo site_url('projects/calender?id='.$project->id); ?>">Calender</a>
+			</div>
         </div>
     </div>
 </div>
@@ -266,36 +280,39 @@ include 'pagetop.php';
 <div class="hide addTaskForm">
     <fieldset>
     <div class="control-group">
-        <input type="text" name="task[new]" placeholder="Task title" class="input-xlarge"
-                data-toggle="tooltip" 
-                title="Task title">
+        <input type="text" name="task[new]" placeholder="Task title" class="input-xlarge" data-toggle="tooltip" title="Task title" />
     </div>
     <div class="control-group">
-        <textarea name="description[new]" placeholder="Task description" class="autogrow input-xlarge"
-                data-toggle="tooltip" 
-                title="Task description"></textarea>
+        <textarea name="description[new]" placeholder="Task description" class="autogrow input-xlarge" data-toggle="tooltip" title="Task description"></textarea>
     </div>
     <div class="control-group">
-        <label>Assign to:
-        <select name="user_id[new]" placeholder="Assigned to"
-                data-toggle="tooltip" 
-                title="Assign this task to selected user">
-            <?php 
-                $users = $this->db->query("SELECT * FROM users " . ( $this->orca_auth->user->client_id ? "WHERE client_id = {$this->orca_auth->user->client_id}" : "" ). " ORDER BY username")->result(); 
-                foreach($users as $u) {
-                    echo '<option value="'.$u->id.'">'.$u->username.'</option>';
-                }
-            ?>
-        </select></label>
+        <label>
+			Assign to:
+			<select name="user_id[new]" placeholder="Assigned to" data-toggle="tooltip" title="Assign this task to selected user">
+				<?php
+					$users = $this->db->query("SELECT * FROM users " . ( $this->orca_auth->user->client_id ? "WHERE client_id = {$this->orca_auth->user->client_id}" : "" ). " ORDER BY username")->result(); 
+					foreach($users as $u) { echo '<option value="'.$u->id.'">'.$u->username.'</option>'; }
+				?>
+			</select>
+		</label>
     </div>
     <div class="control-group">
-        <label>Due date:
+        <label>
+			Due date:
             <span class="input-append">
-                <input type="text" name="due[new]" class="input-small datepicker" data-date-format="dd/mm/yyyy" value="">
+                <input type="text" name="due[new]" class="input-small datepicker" value="">
                 <span class="add-on"><i class="icon-th"></i></span>
             </span>
         </label>
     </div>
+	<div class="control-group">
+		<label>Attach Files</label>
+		<div data-id="uploadcontainer" class="swap-id">
+			<div class="filelist"></div>
+			<a data-id="pickfiles" class="btn btn-info btn-small swap-id" href="#">Select files</a>
+			<a class="btn btn-small uploadfiles" href="#">Upload files</a>
+		</div>
+	</div>
     <div class="form-actions">
         <button type="submit" class="btn btn-primary">Save changes</button>
         <a class="btn btn-cancel-form" href="#">Cancel</a>

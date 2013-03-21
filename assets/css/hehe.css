@@ -78,3 +78,6 @@ tr.status-close td,tr.status-close th,tr.status-complete td,tr.status-complete t
 @media (max-width: 979px) {
     body {padding:0;}
 }
+
+.big-popup { width: 860px; margin-left: -430px; }
+.big-popup input, .big-popup textarea, .big-popup .uneditable-input { width: 506px; }

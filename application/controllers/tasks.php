@@ -217,5 +217,9 @@ class Tasks extends MY_Controller {
         show_404();
     }
     
+	public function ajaxdelete() {
+		$result = $this->Task_model->Delete(array('id' => $_POST['id']));
+		echo json_encode($result);
+	}
 }
 

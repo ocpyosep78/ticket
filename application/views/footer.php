@@ -1,7 +1,11 @@
     <script src="<?php echo base_url('assets/js/bootstrap.min.js'); ?>"></script>
     <script type="text/javascript" src="<?php echo base_url('assets/js/datepicker/js/bootstrap-datepicker.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('assets/js/plupload/js/browserplus-min.js'); ?>"></script>
+	<script type="text/javascript" src="<?php echo base_url('assets/js/plupload/js/plupload.full.js'); ?>"></script>
     <script type="text/javascript" src="<?php echo base_url('assets/js/jquery.autogrow-textarea.js'); ?>"></script>
-    <script type="text/javascript">
+	<script type="text/javascript" src="<?php echo base_url('assets/js/calender/fullcalendar.js'); ?>"></script>
+    <script type="text/javascript" src="<?php echo base_url('assets/js/common.js'); ?>"></script>
+	<script type="text/javascript">
         var has_perms = function(uri) {
             return typeof window._PERMS[ uri ] != 'undefined' ? true : false;
         },

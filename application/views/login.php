@@ -25,5 +25,8 @@ include 'header.php';
 </form>
 
 </div> <!-- /container -->
+<script>
+	$('#id_username').focus();
+</script>
 
 <?php include 'footer.php'; ?>

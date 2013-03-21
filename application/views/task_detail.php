@@ -83,11 +83,12 @@ include 'pagetop.php';
             <h3><?php echo htmlspecialchars($task->task); ?> <?php echo $btndone; ?></h3>
             <div class="ticket-description"><div class="text"><?php echo nl2br(htmlspecialchars($task->description)); ?></div></div>
             <p>
-                User:<span class="label label-info"><?php echo $task->assigned_user; ?></span>
+                User: <span class="label label-info"><?php echo $task->assigned_user; ?></span>
                 <?php echo $str_due; ?>
                 <br><a href="<?php echo site_url('projects/tasks?id='.$task->project_id); ?>">back to timelines</a>
             </p>
             
+			<?php $this->load->view('common/files', array( 'task_id' => $task->id )); ?>
             <?php include 'history.php'; show_history( 'tasks', $task->id ); ?>
 
             <div class="comments">

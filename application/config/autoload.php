@@ -64,7 +64,7 @@ $autoload['libraries'] = array('database', 'orca_auth', 'form_validation');
 |	$autoload['helper'] = array('url', 'file');
 */
 
-$autoload['helper'] = array('url', 'form', 'my');
+$autoload['helper'] = array('url', 'form', 'my', 'common', 'date');
 
 
 /*
@@ -109,7 +109,7 @@ $autoload['language'] = array();
 |
 */
 
-$autoload['model'] = array('User_model');
+$autoload['model'] = array('User_model', 'Task_model', 'File_model', 'Project_model');
 
 
 /* End of file autoload.php */

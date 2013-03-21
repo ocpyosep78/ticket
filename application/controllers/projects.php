@@ -86,37 +86,44 @@ class Projects extends MY_Controller {
                         $t = trim($t);
                         if (!$t) continue;
                         
-                        $descr = empty($description[$k][$i]) ? '' : $description[$k][$i];
-                        $user_id = empty($user_id[$k][$i]) ? 0 : $user_id[$k][$i];
-                        $due = empty($due[$k][$i]) ? date('d/m/Y', strtotime('+1 day')) : $due[$k][$i];
-                        $parent_id = empty($parent_id[$k][$i]) ? 0 : $parent_id[$k][$i];
-                        $task_id = empty($task_id[$k][$i]) ? 0 : $task_id[$k][$i];
-                        $tl_id = empty($timeline_id[$k][$i]) ? 0 : $timeline_id[$k][$i];
+                        $_descr = empty($description[$k][$i]) ? '' : $description[$k][$i];
+                        $_user_id = empty($user_id[$k][$i]) ? 0 : $user_id[$k][$i];
+                        $_due = empty($due[$k][$i]) ? date('Y-m-d', strtotime('+1 day')) : $due[$k][$i];
+                        $_parent_id = empty($parent_id[$k][$i]) ? 0 : $parent_id[$k][$i];
+                        $_tl_id = empty($timeline_id[$k][$i]) ? 0 : $timeline_id[$k][$i];
                         
-                        $array = array_map('intval',explode('/', $due));
-                        $due = date('Y-m-d', strtotime("$array[2]-$array[1]-$array[0]") + $tzoffset);
+                        $_due = date('Y-m-d', strtotime($_due) + $tzoffset);
                         $client_id =  $project->client_id;
                         
                         if ($k == 'new') {
                             $this->db->query("INSERT INTO tasks (task,description,user_id,due,client_id,parent_id,project_id,timeline_id) 
                                 VALUES (?,?,?,?,?,?,?,?)",
-                                    array( $t, $descr, $user_id, $due, $client_id, $parent_id, $project->id, $tl_id ));
-                            $k = $this->db->insert_id();
+                                    array( $t, $_descr, $_user_id, $_due, $client_id, $_parent_id, $project->id, $_tl_id ));
+                            $task_id = $this->db->insert_id();
                         } else {
                             $this->db->query("UPDATE tasks SET task = ?, description = ?, user_id = ?, due = ? WHERE id = ?",
-                                    array( $t, $descr, $user_id, $due, $k ));
+                                    array( $t, $_descr, $_user_id, $_due, $k ));
+							$task_id = $k;
                         }
+						
+						// attachment
+						if (isset($_POST['attachment'][$k]) && isset($_POST['attachment'][$k][$i])) {
+							$attachemnt = $_POST['attachment'][$k][$i];
+							foreach ($attachemnt as $file) {
+								$Param = array( 'file' => $file, 'task_id' => $task_id );
+								$this->File_model->Add($Param);
+							}
+						}
                         
-                        do_action( 'after_save', array( $this->orca_auth->user, 'tasks', $k, "edit task $task" ) );
+                        do_action( 'after_save', array( $this->orca_auth->user, 'tasks', $task_id, "edit task $task" ) );
                         $success = true;
                     }
                 }
                 
                 do_action( 'after_task_edit', array( $this ) );
             }
-            
-            if ($success)
-            {
+			
+            if ($success) {
                 flashmsg_set("Task data has been updated");
             }
             
@@ -137,6 +144,13 @@ class Projects extends MY_Controller {
         $this->load->view('projects_tasks', array('project' => $project, 'timelines' => $timelines, 'tasks' => $tasks));
     }
     
+	function calender() {
+        $this->id = intval($this->input->get_post('id'));
+        if (!$this->id) show_404();
+		
+		$this->load->view('project_calender');
+	}
+	
     public function handle_attachments($client_id, $var_name, $id, $attachment) {
         $upload_tmp_dir = str_replace('\\', '/', FCPATH) . '/files/plupload';
         $upload_dir = str_replace('\\', '/', FCPATH) . '/files/attachments';
@@ -262,7 +276,6 @@ class Projects extends MY_Controller {
         
         $this->load->view('projects_tickets',array( 'project' => $project ));
     }
-            
     
     public function all() {
         $aColumns = array('projects.id', 'projects.title', 'projects.description', 'users.username AS user_create',
