@@ -399,8 +399,8 @@ var Func = {
 				{title : "Image files", extensions : "jpg,jpeg,gif,png"},
 				{title : "Compressed files", extensions : "zip,gz,tar,bz2"},
 				{title : "Document files", extensions : "pdf,doc,xls,docx,xlsx,pptx,ppt,odt,txt,rtf"}
-			],
-			resize : {width : 320, height : 240, quality : 90}
+			]
+//			, resize : {width : 320, height : 240, quality : 90}
 		});
 		
 		$('#' + p.container + ' .uploadfiles').click(function(e) {
